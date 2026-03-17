@@ -118,6 +118,16 @@ export const fetchMovies = async (
   return mapped
 }
 
+export const prefetchMovies = async (filter: MoviesFilter) => {
+  const cacheKey = makeCacheKey(filter)
+  const cached = cache.get(cacheKey)
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.value
+  }
+
+  return fetchMovies(filter).catch(() => undefined)
+}
+
 export const fetchMovieById = async (id: string | number): Promise<MovieDetails> => {
   const { data } = await apiClient.get<ApiMovie>(`/v1.4/movie/${id}`)
   return mapMovieDetailsFromApi(data)

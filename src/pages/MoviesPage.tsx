@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { fetchMovies } from '../api/movies'
+import { fetchMovies, prefetchMovies } from '../api/movies'
 import type { MovieShort } from '../types/movie'
 import { MovieCard } from '../components/MovieCard'
 import { InfiniteScroller } from '../components/InfiniteScroller'
@@ -54,6 +54,17 @@ export const MoviesPage = () => {
         setHasMore(pageToLoad < response.pages)
         setPage(pageToLoad)
         setMovies((prev) => (replace ? response.docs : [...prev, ...response.docs]))
+        if (pageToLoad === 1 && response.pages > 1) {
+          void prefetchMovies({
+            page: 2,
+            limit: PAGE_SIZE,
+            genres: debouncedFilters.genres,
+            ratingFrom: debouncedFilters.ratingFrom,
+            ratingTo: debouncedFilters.ratingTo,
+            yearFrom: debouncedFilters.yearFrom,
+            yearTo: debouncedFilters.yearTo,
+          })
+        }
       } catch (e) {
         if (axios.isAxiosError(e) && (e.code === 'ERR_CANCELED' || e.name === 'CanceledError')) {
           return

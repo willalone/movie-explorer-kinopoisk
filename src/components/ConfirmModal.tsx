@@ -19,8 +19,6 @@ export const ConfirmModal = ({
   onClose,
   onConfirm,
 }: ConfirmModalProps) => {
-  if (!open) return null
-
   const titleId = useId()
   const descriptionId = useId()
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -29,6 +27,8 @@ export const ConfirmModal = ({
   const describedBy = useMemo(() => (description ? descriptionId : undefined), [description, descriptionId])
 
   useEffect(() => {
+    if (!open) return
+
     previouslyFocused.current = document.activeElement as HTMLElement | null
 
     const node = panelRef.current
@@ -68,7 +68,9 @@ export const ConfirmModal = ({
       document.body.style.overflow = ''
       previouslyFocused.current?.focus?.()
     }
-  }, [onClose])
+  }, [open, onClose])
+
+  if (!open) return null
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
