@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { BrowserRouter } from 'react-router-dom'
 import { MovieCard } from '../components/MovieCard'
-import { FavoritesProvider } from '../store/FavoritesContext'
-import { CompareProvider } from '../store/CompareContext'
+import { FavoritesProvider } from '../store/FavoritesProvider'
+import { CompareProvider } from '../store/CompareProvider'
 import type { MovieShort } from '../types/movie'
 
 const meta: Meta<typeof MovieCard> = {

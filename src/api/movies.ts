@@ -68,6 +68,7 @@ const mapMovieFromApi = (movie: ApiMovie): MovieShort => ({
   name: movie.name,
   year: movie.year,
   rating: movie.rating?.kp,
+  alternativeName: movie.alternativeName,
   genres: movie.genres,
   poster: movie.poster,
   movieLength: movie.movieLength,
@@ -76,7 +77,6 @@ const mapMovieFromApi = (movie: ApiMovie): MovieShort => ({
 const mapMovieDetailsFromApi = (movie: ApiMovie): MovieDetails => ({
   ...mapMovieFromApi(movie),
   description: movie.description,
-  alternativeName: movie.alternativeName,
   slogan: movie.slogan,
   premiere: movie.premiere,
 })

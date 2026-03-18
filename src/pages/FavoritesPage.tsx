@@ -1,5 +1,5 @@
 import { MovieCard } from '../components/MovieCard'
-import { useFavorites } from '../store/FavoritesContext'
+import { useFavorites } from '../store/useFavorites'
 import { useState } from 'react'
 import type { MovieShort } from '../types/movie'
 import { ConfirmModal } from '../components/ConfirmModal'

@@ -5,7 +5,7 @@ import { MovieCard } from '../components/MovieCard'
 import { InfiniteScroller } from '../components/InfiniteScroller'
 import { MoviesFilters } from '../components/MoviesFilters'
 import type { MoviesFiltersValue } from '../components/MoviesFilters'
-import { useFavorites } from '../store/FavoritesContext'
+import { useFavorites } from '../store/useFavorites'
 import { ConfirmModal } from '../components/ConfirmModal'
 import axios from 'axios'
 import { useDebouncedValue } from '../hooks/useDebouncedValue'
@@ -115,7 +115,7 @@ export const MoviesPage = () => {
   const visibleMovies = useMemo(() => {
     if (!query) return movies
     return movies.filter((m) => {
-      const title = (m.name || (m as any).alternativeName || '').toString().toLowerCase()
+      const title = (m.name || m.alternativeName || '').toString().toLowerCase()
       return title.includes(query)
     })
   }, [movies, query])

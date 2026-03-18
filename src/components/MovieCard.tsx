@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { MovieShort } from '../types/movie'
-import { useFavorites } from '../store/FavoritesContext'
-import { useCompare } from '../store/CompareContext'
+import { useFavorites } from '../store/useFavorites'
+import { useCompare } from '../store/useCompare'
 
 interface MovieCardProps {
   movie: MovieShort

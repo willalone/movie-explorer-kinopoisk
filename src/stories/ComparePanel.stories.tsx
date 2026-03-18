@@ -1,8 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { useEffect } from 'react'
 import { ComparePanel } from '../components/ComparePanel'
-import { CompareProvider, useCompare } from '../store/CompareContext'
+import { CompareProvider } from '../store/CompareProvider'
+import { useCompare } from '../store/useCompare'
 import type { MovieShort } from '../types/movie'
 
 const sampleItems: MovieShort[] = [
@@ -29,7 +30,7 @@ const WithItems = () => {
 
   useEffect(() => {
     sampleItems.forEach((movie) => toggleItem(movie))
-  }, [])
+    }, [toggleItem])
 
   return <ComparePanel />
 }

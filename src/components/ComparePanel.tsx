@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useCompare } from '../store/CompareContext'
+import { useCompare } from '../store/useCompare'
 
 export const ComparePanel = () => {
   const { items } = useCompare()

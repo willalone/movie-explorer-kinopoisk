@@ -3,6 +3,7 @@ export interface MovieShort {
   name: string
   year?: number
   rating?: number
+  alternativeName?: string
   genres?: { name: string }[]
   poster?: {
     url?: string
@@ -13,7 +14,6 @@ export interface MovieShort {
 
 export interface MovieDetails extends MovieShort {
   description?: string
-  alternativeName?: string
   slogan?: string
   premiere?: {
     world?: string

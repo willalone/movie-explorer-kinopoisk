@@ -73,15 +73,22 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
       yearFrom: clamp(yearFrom, 1990, new Date().getFullYear()),
       yearTo: clamp(yearTo, 1990, new Date().getFullYear()),
     }
-    setInternal(next)
-    setInputs({
-      ratingFrom: String(next.ratingFrom),
-      ratingTo: String(next.ratingTo),
-      yearFrom: String(next.yearFrom),
-      yearTo: String(next.yearTo),
-    })
-    onChange(next)
     didInitFromUrl.current = true
+
+    const schedule = typeof queueMicrotask === 'function'
+      ? queueMicrotask
+      : (cb: () => void) => Promise.resolve().then(cb)
+
+    schedule(() => {
+      setInternal(next)
+      setInputs({
+        ratingFrom: String(next.ratingFrom),
+        ratingTo: String(next.ratingTo),
+        yearFrom: String(next.yearFrom),
+        yearTo: String(next.yearTo),
+      })
+      onChange(next)
+    })
   }, [onChange, searchParams])
 
   useEffect(() => {

@@ -1,17 +1,9 @@
 import type { ReactNode } from 'react'
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { MovieShort } from '../types/movie'
+import { FavoritesContext } from './FavoritesContext'
 
 const STORAGE_KEY = 'movie-explorer:favorites'
-
-interface FavoritesContextValue {
-  favorites: MovieShort[]
-  add: (movie: MovieShort) => void
-  remove: (id: number) => void
-  isFavorite: (id: number) => boolean
-}
-
-const FavoritesContext = createContext<FavoritesContextValue | undefined>(undefined)
 
 const loadInitial = (): MovieShort[] => {
   if (typeof window === 'undefined') return []
@@ -43,13 +35,5 @@ export const FavoritesProvider = ({ children }: { children: ReactNode }) => {
   )
 
   return <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>
-}
-
-export const useFavorites = () => {
-  const ctx = useContext(FavoritesContext)
-  if (!ctx) {
-    throw new Error('useFavorites must be used within FavoritesProvider')
-  }
-  return ctx
 }
 
