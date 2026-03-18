@@ -39,6 +39,10 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
     yearFrom: String(value.yearFrom),
     yearTo: String(value.yearTo),
   })
+  const [errors, setErrors] = useState({
+    rating: '',
+    year: '',
+  })
 
   const defaults: MoviesFiltersValue = useMemo(
     () => ({
@@ -123,35 +127,67 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
     setInputs((prev) => ({ ...prev, [field]: raw }))
 
     if (raw === '') {
+      setErrors((prev) =>
+        field === 'ratingFrom' || field === 'ratingTo'
+          ? { ...prev, rating: '' }
+          : { ...prev, year: '' },
+      )
       return
     }
 
-    const parsed = Number(raw)
-    if (Number.isNaN(parsed)) return
+    const valueNum = Number(raw)
+    if (Number.isNaN(valueNum)) return
 
     setInternal((prev) => {
       if (field === 'ratingFrom') {
-        return {
-          ...prev,
-          ratingFrom: clamp(parsed, 0, prev.ratingTo),
+        if (valueNum < 0 || valueNum > 10) {
+          setErrors((e) => ({ ...e, rating: 'Рейтинг должен быть от 0 до 10.' }))
+          return prev
         }
+        if (valueNum > prev.ratingTo) {
+          setErrors((e) => ({ ...e, rating: 'Минимальный рейтинг не может быть больше максимального.' }))
+          return prev
+        }
+        setErrors((e) => ({ ...e, rating: '' }))
+        return { ...prev, ratingFrom: valueNum }
       }
+
       if (field === 'ratingTo') {
-        return {
-          ...prev,
-          ratingTo: clamp(parsed, prev.ratingFrom, 10),
+        if (valueNum < 0 || valueNum > 10) {
+          setErrors((e) => ({ ...e, rating: 'Рейтинг должен быть от 0 до 10.' }))
+          return prev
         }
+        if (valueNum < prev.ratingFrom) {
+          setErrors((e) => ({ ...e, rating: 'Максимальный рейтинг не может быть меньше минимального.' }))
+          return prev
+        }
+        setErrors((e) => ({ ...e, rating: '' }))
+        return { ...prev, ratingTo: valueNum }
       }
+
       if (field === 'yearFrom') {
-        return {
-          ...prev,
-          yearFrom: clamp(parsed, 1990, prev.yearTo),
+        if (valueNum < 1990 || valueNum > currentYear) {
+          setErrors((e) => ({ ...e, year: `Год должен быть от 1990 до ${currentYear}.` }))
+          return prev
         }
+        if (valueNum > prev.yearTo) {
+          setErrors((e) => ({ ...e, year: 'Минимальный год не может быть больше максимального.' }))
+          return prev
+        }
+        setErrors((e) => ({ ...e, year: '' }))
+        return { ...prev, yearFrom: valueNum }
       }
-      return {
-        ...prev,
-        yearTo: clamp(parsed, prev.yearFrom, currentYear),
+
+      if (valueNum < 1990 || valueNum > currentYear) {
+        setErrors((e) => ({ ...e, year: `Год должен быть от 1990 до ${currentYear}.` }))
+        return prev
       }
+      if (valueNum < prev.yearFrom) {
+        setErrors((e) => ({ ...e, year: 'Максимальный год не может быть меньше минимального.' }))
+        return prev
+      }
+      setErrors((e) => ({ ...e, year: '' }))
+      return { ...prev, yearTo: valueNum }
     })
   }
 
@@ -268,6 +304,7 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
               />
             </label>
           </div>
+          {errors.rating && <div className="filters__hint filters__hint--error">{errors.rating}</div>}
         </div>
 
         <div className="filters__block">
@@ -294,6 +331,7 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
               />
             </label>
           </div>
+          {errors.year && <div className="filters__hint filters__hint--error">{errors.year}</div>}
         </div>
       </div>
     </section>

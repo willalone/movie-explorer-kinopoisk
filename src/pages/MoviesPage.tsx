@@ -114,7 +114,10 @@ export const MoviesPage = () => {
   const query = filters.query.trim().toLowerCase()
   const visibleMovies = useMemo(() => {
     if (!query) return movies
-    return movies.filter((m) => m.name.toLowerCase().includes(query))
+    return movies.filter((m) => {
+      const title = (m.name || (m as any).alternativeName || '').toString().toLowerCase()
+      return title.includes(query)
+    })
   }, [movies, query])
 
   const totalLoaded = useMemo(() => visibleMovies.length, [visibleMovies.length])
@@ -157,11 +160,13 @@ export const MoviesPage = () => {
                   />
                 ))}
           </div>
-          {loading && <div className="movies-list__loader">Загрузка...</div>}
+          {loading && (!query || visibleMovies.length > 0) && (
+            <div className="movies-list__loader">Загрузка...</div>
+          )}
           {!loading && movies.length === 0 && (
             <div className="movies-list__empty">Нет фильмов по заданным фильтрам</div>
           )}
-          {!loading && movies.length > 0 && visibleMovies.length === 0 && query && (
+          {movies.length > 0 && visibleMovies.length === 0 && query && (
             <div className="movies-list__empty">По запросу ничего не найдено среди загруженных результатов</div>
           )}
         </InfiniteScroller>

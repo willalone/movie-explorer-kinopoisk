@@ -458,6 +458,9 @@
   overflow: hidden;
   border: 1px solid var(--border);
   background: radial-gradient(circle at top, rgba(148, 163, 184, 0.5), #020617);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
 }
 
 .movie-details__poster {
@@ -466,7 +469,8 @@
 }
 
 .movie-details__poster--placeholder {
-  padding: 80px 20px;
+  flex: 1;
+  padding: 40px 20px;
   text-align: center;
   font-size: 14px;
   color: rgba(148, 163, 184, 0.9);
@@ -597,6 +601,15 @@
 
 .pill:hover {
   border-color: rgba(148, 163, 184, 0.6);
+}
+
+.filters__hint {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.filters__hint--error {
+  color: rgba(252, 165, 165, 0.95);
 }
 
 .movie-card--skeleton {
