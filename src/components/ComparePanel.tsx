@@ -13,17 +13,19 @@ export const ComparePanel = () => {
 
   return (
     <section className={collapsed ? 'compare-panel compare-panel--collapsed' : 'compare-panel'}>
-      <button
-        type="button"
-        className="compare-panel__toggle"
-        onClick={() => setCollapsed((prev) => !prev)}
-      >
-        {collapsed ? `Показать сравнение (${count})` : 'Свернуть'}
-      </button>
+      <div className="compare-panel__header">
+        <h2 className="compare-panel__title">Сравнение фильмов</h2>
+        <button
+          type="button"
+          className="compare-panel__toggle"
+          onClick={() => setCollapsed((prev) => !prev)}
+        >
+          {collapsed ? `Показать (${count})` : 'Скрыть'}
+        </button>
+      </div>
 
       {!collapsed && (
         <>
-          <h2 className="compare-panel__title">Сравнение фильмов</h2>
           <div className="compare-panel__table-wrapper">
             <table className="compare-panel__table">
               <thead>

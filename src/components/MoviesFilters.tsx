@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 export interface MoviesFiltersValue {
+  query: string
   genres: string[]
   ratingFrom: number
   ratingTo: number
@@ -32,9 +33,16 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
   const [internal, setInternal] = useState<MoviesFiltersValue>(value)
   const currentYear = useMemo(() => new Date().getFullYear(), [])
   const didInitFromUrl = useRef(false)
+  const [inputs, setInputs] = useState({
+    ratingFrom: String(value.ratingFrom),
+    ratingTo: String(value.ratingTo),
+    yearFrom: String(value.yearFrom),
+    yearTo: String(value.yearTo),
+  })
 
   const defaults: MoviesFiltersValue = useMemo(
     () => ({
+      query: '',
       genres: [],
       ratingFrom: 0,
       ratingTo: 10,
@@ -46,6 +54,7 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
 
   useEffect(() => {
     if (didInitFromUrl.current) return
+    const query = searchParams.get('q') ?? ''
     const genres = searchParams.get('genres')?.split(',').filter(Boolean) ?? []
     const ratingFrom = Number(searchParams.get('ratingFrom') ?? 0)
     const ratingTo = Number(searchParams.get('ratingTo') ?? 10)
@@ -53,6 +62,7 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
     const yearTo = Number(searchParams.get('yearTo') ?? new Date().getFullYear())
 
     const next: MoviesFiltersValue = {
+      query,
       genres,
       ratingFrom: clamp(ratingFrom, 0, 10),
       ratingTo: clamp(ratingTo, 0, 10),
@@ -60,12 +70,21 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
       yearTo: clamp(yearTo, 1990, new Date().getFullYear()),
     }
     setInternal(next)
+    setInputs({
+      ratingFrom: String(next.ratingFrom),
+      ratingTo: String(next.ratingTo),
+      yearFrom: String(next.yearFrom),
+      yearTo: String(next.yearTo),
+    })
     onChange(next)
     didInitFromUrl.current = true
   }, [onChange, searchParams])
 
   useEffect(() => {
     const params: Record<string, string> = {}
+    if (internal.query.trim()) {
+      params.q = internal.query.trim()
+    }
     if (internal.genres.length) {
       params.genres = internal.genres.join(',')
     }
@@ -87,6 +106,7 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
   }
 
   const hasAnyFilter =
+    internal.query.trim() !== '' ||
     internal.genres.length > 0 ||
     internal.ratingFrom !== defaults.ratingFrom ||
     internal.ratingTo !== defaults.ratingTo ||
@@ -96,8 +116,70 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
   const removeGenre = (genre: string) =>
     setInternal((prev) => ({ ...prev, genres: prev.genres.filter((g) => g !== genre) }))
 
+  const handleNumericChange = (
+    field: 'ratingFrom' | 'ratingTo' | 'yearFrom' | 'yearTo',
+    raw: string,
+  ) => {
+    setInputs((prev) => ({ ...prev, [field]: raw }))
+
+    if (raw === '') {
+      return
+    }
+
+    const parsed = Number(raw)
+    if (Number.isNaN(parsed)) return
+
+    setInternal((prev) => {
+      if (field === 'ratingFrom') {
+        return {
+          ...prev,
+          ratingFrom: clamp(parsed, 0, prev.ratingTo),
+        }
+      }
+      if (field === 'ratingTo') {
+        return {
+          ...prev,
+          ratingTo: clamp(parsed, prev.ratingFrom, 10),
+        }
+      }
+      if (field === 'yearFrom') {
+        return {
+          ...prev,
+          yearFrom: clamp(parsed, 1990, prev.yearTo),
+        }
+      }
+      return {
+        ...prev,
+        yearTo: clamp(parsed, prev.yearFrom, currentYear),
+      }
+    })
+  }
+
   return (
     <section className="filters">
+      <div className="filters__block">
+        <div className="filters__header">
+          <h2 className="filters__title">Поиск</h2>
+          {internal.query.trim() && (
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={() => setInternal((prev) => ({ ...prev, query: '' }))}
+            >
+              Очистить
+            </button>
+          )}
+        </div>
+        <div className="filters__search">
+          <input
+            className="filters__search-input"
+            placeholder="Название фильма"
+            value={internal.query}
+            onChange={(e) => setInternal((prev) => ({ ...prev, query: e.target.value }))}
+          />
+        </div>
+      </div>
+
       <div className="filters__block">
         <div className="filters__header">
           <h2 className="filters__title">Жанры</h2>
@@ -109,6 +191,16 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
         </div>
         {hasAnyFilter && (
           <div className="filters__active">
+            {internal.query.trim() && (
+              <button
+                type="button"
+                className="pill"
+                onClick={() => setInternal((prev) => ({ ...prev, query: '' }))}
+                title="Убрать поиск"
+              >
+                {internal.query.trim()} <span aria-hidden="true">×</span>
+              </button>
+            )}
             {internal.genres.map((g) => (
               <button key={g} type="button" className="pill" onClick={() => removeGenre(g)} title="Убрать жанр">
                 {g} <span aria-hidden="true">×</span>
@@ -161,13 +253,8 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
                 type="number"
                 min={0}
                 max={internal.ratingTo}
-                value={internal.ratingFrom}
-                onChange={(e) =>
-                  setInternal((prev) => ({
-                    ...prev,
-                    ratingFrom: clamp(Number(e.target.value), 0, prev.ratingTo),
-                  }))
-                }
+                value={inputs.ratingFrom}
+                onChange={(e) => handleNumericChange('ratingFrom', e.target.value)}
               />
             </label>
             <label>
@@ -176,13 +263,8 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
                 type="number"
                 min={internal.ratingFrom}
                 max={10}
-                value={internal.ratingTo}
-                onChange={(e) =>
-                  setInternal((prev) => ({
-                    ...prev,
-                    ratingTo: clamp(Number(e.target.value), prev.ratingFrom, 10),
-                  }))
-                }
+                value={inputs.ratingTo}
+                onChange={(e) => handleNumericChange('ratingTo', e.target.value)}
               />
             </label>
           </div>
@@ -197,13 +279,8 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
                 type="number"
                 min={1990}
                 max={internal.yearTo}
-                value={internal.yearFrom}
-                onChange={(e) =>
-                  setInternal((prev) => ({
-                    ...prev,
-                    yearFrom: clamp(Number(e.target.value), 1990, prev.yearTo),
-                  }))
-                }
+                value={inputs.yearFrom}
+                onChange={(e) => handleNumericChange('yearFrom', e.target.value)}
               />
             </label>
             <label>
@@ -212,13 +289,8 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
                 type="number"
                 min={internal.yearFrom}
                 max={currentYear}
-                value={internal.yearTo}
-                onChange={(e) =>
-                  setInternal((prev) => ({
-                    ...prev,
-                    yearTo: clamp(Number(e.target.value), prev.yearFrom, currentYear),
-                  }))
-                }
+                value={inputs.yearTo}
+                onChange={(e) => handleNumericChange('yearTo', e.target.value)}
               />
             </label>
           </div>

@@ -118,14 +118,17 @@ export const fetchMovies = async (
   return mapped
 }
 
-export const prefetchMovies = async (filter: MoviesFilter) => {
+export const prefetchMovies = async (
+  filter: MoviesFilter,
+  opts?: { signal?: AbortSignal },
+) => {
   const cacheKey = makeCacheKey(filter)
   const cached = cache.get(cacheKey)
   if (cached && cached.expiresAt > Date.now()) {
     return cached.value
   }
 
-  return fetchMovies(filter).catch(() => undefined)
+  return fetchMovies(filter, { signal: opts?.signal }).catch(() => undefined)
 }
 
 export const fetchMovieById = async (id: string | number): Promise<MovieDetails> => {

@@ -135,6 +135,26 @@
   outline: none;
 }
 
+.filters__search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.filters__search-input {
+  width: 100%;
+}
+
+.filters input[type='number']::-webkit-inner-spin-button,
+.filters input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.filters input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 .filters input:focus {
   border-color: var(--accent-border);
   box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.18);
@@ -374,15 +394,20 @@
   color: #e5e7eb;
 }
 
-.compare-panel__title {
-  font-size: 14px;
+.compare-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 6px;
 }
 
+.compare-panel__title {
+  font-size: 14px;
+  margin: 0;
+}
+
 .compare-panel__toggle {
-  position: absolute;
-  right: 16px;
-  top: 8px;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.7);
@@ -397,7 +422,6 @@
 }
 
 .compare-panel--collapsed .compare-panel__toggle {
-  position: static;
 }
 
 .compare-panel__table-wrapper {
@@ -446,6 +470,9 @@
   text-align: center;
   font-size: 14px;
   color: rgba(148, 163, 184, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .movie-details__content {

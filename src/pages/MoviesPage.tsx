@@ -15,6 +15,7 @@ const PAGE_SIZE = 50
 
 export const MoviesPage = () => {
   const [filters, setFilters] = useState<MoviesFiltersValue>({
+    query: '',
     genres: [],
     ratingFrom: 0,
     ratingTo: 10,
@@ -29,7 +30,17 @@ export const MoviesPage = () => {
   const [pendingFavorite, setPendingFavorite] = useState<MovieShort | null>(null)
 
   const { add: addFavorite, remove: removeFavorite } = useFavorites()
-  const debouncedFilters = useDebouncedValue(filters, 350)
+  const apiFilters = useMemo(
+    () => ({
+      genres: filters.genres,
+      ratingFrom: filters.ratingFrom,
+      ratingTo: filters.ratingTo,
+      yearFrom: filters.yearFrom,
+      yearTo: filters.yearTo,
+    }),
+    [filters.genres, filters.ratingFrom, filters.ratingTo, filters.yearFrom, filters.yearTo],
+  )
+  const debouncedFilters = useDebouncedValue(apiFilters, 350)
   const abortRef = useRef<AbortController | null>(null)
 
   const loadPage = useCallback(
@@ -63,7 +74,7 @@ export const MoviesPage = () => {
             ratingTo: debouncedFilters.ratingTo,
             yearFrom: debouncedFilters.yearFrom,
             yearTo: debouncedFilters.yearTo,
-          })
+          }, { signal: controller.signal })
         }
       } catch (e) {
         if (axios.isAxiosError(e) && (e.code === 'ERR_CANCELED' || e.name === 'CanceledError')) {
@@ -100,7 +111,13 @@ export const MoviesPage = () => {
     }
   }
 
-  const totalLoaded = useMemo(() => movies.length, [movies.length])
+  const query = filters.query.trim().toLowerCase()
+  const visibleMovies = useMemo(() => {
+    if (!query) return movies
+    return movies.filter((m) => m.name.toLowerCase().includes(query))
+  }, [movies, query])
+
+  const totalLoaded = useMemo(() => visibleMovies.length, [visibleMovies.length])
   const isInitialLoading = loading && movies.length === 0
 
   return (
@@ -109,13 +126,16 @@ export const MoviesPage = () => {
 
       <section className="movies-list">
         <div className="movies-list__header">
-          <h1>Популярные фильмы</h1>
-          <span className="movies-list__counter">{totalLoaded} фильмов загружено</span>
+          <span className="movies-list__counter">
+            {totalLoaded > 0 ? `${totalLoaded} фильмов найдено` : 'Фильмов пока не загружено'}
+          </span>
         </div>
 
         {error && (
           <div className="alert alert--error">
-            <div className="alert__content">{error}</div>
+            <div className="alert__content">
+              {error || 'Фильмы временно не удалось загрузить. Попробуйте обновить страницу чуть позже.'}
+            </div>
             <div className="alert__actions">
               <button type="button" className="btn btn--secondary" onClick={() => void loadPage(1, true)}>
                 Повторить
@@ -128,7 +148,7 @@ export const MoviesPage = () => {
           <div className="movies-grid">
             {isInitialLoading
               ? Array.from({ length: 12 }).map((_, i) => <MovieCardSkeleton key={i} />)
-              : movies.map((movie) => (
+              : visibleMovies.map((movie) => (
                   <MovieCard
                     key={movie.id}
                     movie={movie}
@@ -138,7 +158,12 @@ export const MoviesPage = () => {
                 ))}
           </div>
           {loading && <div className="movies-list__loader">Загрузка...</div>}
-          {!loading && !movies.length && <div className="movies-list__empty">Нет фильмов по заданным фильтрам</div>}
+          {!loading && movies.length === 0 && (
+            <div className="movies-list__empty">Нет фильмов по заданным фильтрам</div>
+          )}
+          {!loading && movies.length > 0 && visibleMovies.length === 0 && query && (
+            <div className="movies-list__empty">По запросу ничего не найдено среди загруженных результатов</div>
+          )}
         </InfiniteScroller>
       </section>
 
