@@ -117,6 +117,13 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
     internal.yearFrom !== defaults.yearFrom ||
     internal.yearTo !== defaults.yearTo
 
+  const hasNonQueryFilters =
+    internal.genres.length > 0 ||
+    internal.ratingFrom !== defaults.ratingFrom ||
+    internal.ratingTo !== defaults.ratingTo ||
+    internal.yearFrom !== defaults.yearFrom ||
+    internal.yearTo !== defaults.yearTo
+
   const removeGenre = (genre: string) =>
     setInternal((prev) => ({ ...prev, genres: prev.genres.filter((g) => g !== genre) }))
 
@@ -196,13 +203,13 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
       <div className="filters__block">
         <div className="filters__header">
           <h2 className="filters__title">Поиск</h2>
-          {internal.query.trim() && (
+          {hasAnyFilter && (
             <button
               type="button"
               className="btn btn--secondary btn--sm"
-              onClick={() => setInternal((prev) => ({ ...prev, query: '' }))}
+              onClick={() => setInternal(defaults)}
             >
-              Очистить
+              Сбросить
             </button>
           )}
         </div>
@@ -214,20 +221,8 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
             onChange={(e) => setInternal((prev) => ({ ...prev, query: e.target.value }))}
           />
         </div>
-      </div>
-
-      <div className="filters__block">
-        <div className="filters__header">
-          <h2 className="filters__title">Жанры</h2>
-          {hasAnyFilter && (
-            <button type="button" className="btn btn--secondary btn--sm" onClick={() => setInternal(defaults)}>
-              Сбросить
-            </button>
-          )}
-        </div>
-        {hasAnyFilter && (
-          <div className="filters__active">
-            {internal.query.trim() && (
+          {internal.query.trim() && (
+            <div className="filters__active">
               <button
                 type="button"
                 className="pill"
@@ -236,7 +231,16 @@ export const MoviesFilters = ({ value, onChange }: MoviesFiltersProps) => {
               >
                 {internal.query.trim()} <span aria-hidden="true">×</span>
               </button>
-            )}
+            </div>
+          )}
+      </div>
+
+      <div className="filters__block">
+        <div className="filters__header">
+          <h2 className="filters__title">Жанры</h2>
+        </div>
+        {hasNonQueryFilters && (
+          <div className="filters__active">
             {internal.genres.map((g) => (
               <button key={g} type="button" className="pill" onClick={() => removeGenre(g)} title="Убрать жанр">
                 {g} <span aria-hidden="true">×</span>

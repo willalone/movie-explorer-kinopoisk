@@ -578,8 +578,13 @@
 .filters__header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
+  margin-bottom: 12px;
+}
+
+.filters__header .filters__title {
+  margin-bottom: 0;
 }
 
 .filters__active {
