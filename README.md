@@ -45,7 +45,7 @@
 5. **Сравнение**
    - до 2 фильмов
    - если выбрать третий — первый автоматически сбрасывается
-   - в сравнительной области: год, рейтинг, жанры, длительность
+   - в сравнительной области: название, год выпуска, рейтинг, жанры, длительность
    - есть кнопка свернуть/развернуть таблицу
 
 ### Настройка окружения
@@ -120,7 +120,8 @@ npm run storybook
 - **Производительность**: запросы отменяются (AbortController), список грузится пачками, есть кеш на уровне API.
 - **A11y**: модальное окно поддерживает `Esc`, делает focus management и возвращает фокус после закрытия.
 
-### Vercel / GitHub
+### Ссылки
 
-- Vercel: https://movie-explorer-kinopoisk.vercel.app/
-- GitHub: [https://github.com/willalone](https://willalone.github.io/movie-explorer-kinopoisk/movies?ratingFrom=0&ratingTo=10&yearFrom=1990&yearTo=2026)
+- **Live-демо (Vercel):** https://movie-explorer-kinopoisk.vercel.app/
+- **GitHub Pages:** https://willalone.github.io/movie-explorer-kinopoisk/
+- **Репозиторий:** https://github.com/willalone/movie-explorer-kinopoisk
