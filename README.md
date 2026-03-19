@@ -124,4 +124,3 @@ npm run storybook
 
 - **Live-демо (Vercel):** https://movie-explorer-kinopoisk.vercel.app/
 - **GitHub Pages:** https://willalone.github.io/movie-explorer-kinopoisk/
-- **Репозиторий:** https://github.com/willalone/movie-explorer-kinopoisk
