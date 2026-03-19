@@ -37,7 +37,12 @@ export const ComparePanel = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td>Год</td>
+                  <td>Название</td>
+                  <td>{first ? <Link to={`/movies/${first.id}`}>{first.name}</Link> : '—'}</td>
+                  <td>{second ? <Link to={`/movies/${second.id}`}>{second.name}</Link> : '—'}</td>
+                </tr>
+                <tr>
+                  <td>Год выпуска</td>
                   <td>{first?.year ?? '—'}</td>
                   <td>{second?.year ?? '—'}</td>
                 </tr>
@@ -52,7 +57,7 @@ export const ComparePanel = () => {
                   <td>{second?.genres?.map((g) => g.name).join(', ') ?? '—'}</td>
                 </tr>
                 <tr>
-                  <td>Длительность (мин)</td>
+                  <td>Длительность</td>
                   <td>{first?.movieLength ?? '—'}</td>
                   <td>{second?.movieLength ?? '—'}</td>
                 </tr>

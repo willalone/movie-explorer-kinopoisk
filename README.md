@@ -86,6 +86,12 @@ npm run preview
 npm test
 ```
 
+E2E (Playwright):
+
+```bash
+npm run test:e2e
+```
+
 Линт:
 
 ```bash
